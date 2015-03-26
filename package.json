@@ -1,0 +1,19 @@
+{
+  "name": "document-outline",
+  "version": "0.0.1",
+  "description": "a helper for creating document outlines",
+  "main": "src/outline.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "html",
+    "outline"
+  ],
+  "author": "Tom Forrer",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-jasmine": "^0.8.2"
+  }
+}
