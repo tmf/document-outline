@@ -33,47 +33,65 @@
          * ]
          * @param containerNode
          */
-        extractOutline: function (containerNode) {
+        extractOutline: function (containerNode, minLevel, maxLevel) {
             var outline = [],
-                currentLevel = 1,
+                currentLevel = typeof minLevel === 'undefined' ? 1 : parseInt(minLevel),
+                maxLevel = typeof maxLevel === 'undefined' ? 6 : parseInt(maxLevel),
                 currentSection = outline,
                 previousElement = null,
                 parentSections = [];
             [].forEach.call(containerNode.querySelectorAll('h1, h2, h3, h4, h5, h6'), function (headingNode) {
-                var title = headingNode.textContent,
-                    level = headingNode.hasAttribute('aria-level') ? parseInt(headingNode.getAttribute('aria-level')) : parseInt(headingNode.nodeName[1]),
+                var title = this.extractTitle(headingNode),
+                    level = this.extractLevel(headingNode),
                     element = {title: title, ref: headingNode, elements: []};
-                if (level > currentLevel) {
-                    parentSections.push(currentSection);
-                    currentSection = previousElement.elements;
-                } else if (level < currentLevel) {
-                    for (var i = 0; i < (currentLevel - level); i++) {
-                        currentSection = parentSections.pop()
+                if(level >= minLevel && level <= maxLevel) {
+                    if (level > currentLevel) {
+                        parentSections.push(currentSection);
+                        currentSection = previousElement.elements;
+                    } else if (level < currentLevel) {
+                        for (var i = 0; i < (currentLevel - level); i++) {
+                            currentSection = parentSections.pop()
+                        }
                     }
+                    currentLevel = level;
+                    currentSection.push(element);
+                    previousElement = element;
                 }
-                currentLevel = level;
-                currentSection.push(element);
-                previousElement = element;
-            });
+            }, this);
             return outline;
+        },
+
+        /**
+         *
+         * @param headingNode
+         * @returns {string}
+         */
+        extractTitle: function(headingNode){
+            return headingNode.textContent;
+        },
+
+        /**
+         *
+         * @param headingNode
+         * @returns {Number}
+         */
+        extractLevel: function(headingNode){
+            return headingNode.hasAttribute('aria-level') ? parseInt(headingNode.getAttribute('aria-level')) : parseInt(headingNode.nodeName[1]);
         },
         /**
          *
          * @param outline
          */
         createTOC: function (outline) {
-
-            var module = this,
-                listElements = outline.map(function (element) {
-
-                    var li = module.createListElement(element);
+            var listElements = outline.map(function (element) {
+                    var li = this.createListElement(element);
 
                     if (element.elements.length > 0) {
-                        li.appendChild(module.createTOC(element.elements));
+                        li.appendChild(this.createTOC(element.elements));
                     }
                     return li;
-                });
-            return module.createList(listElements);
+                }, this);
+            return this.createList(listElements);
         },
 
         /**
@@ -94,10 +112,10 @@
          * @returns {HTMLElement}
          */
         createListElement: function (element) {
-            var module = this,
-                li = document.createElement('li'),
+            var li = document.createElement('li'),
                 anchor = document.createElement('a'),
-                name = module.decorateHeadingWithId(element.ref);
+                name = this.decorateHeadingWithId(element.ref);
+
             anchor.setAttribute('href', '#' + name);
             anchor.textContent = element.title;
             li.appendChild(anchor);
