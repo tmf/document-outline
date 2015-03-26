@@ -1,9 +1,11 @@
 <html>
 <head>
+    <script src="node_modules/slug/slug.js"></script>
     <script src="src/outline.js"></script>
+
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function () {
-            console.log(window.documentOutline.extractOutline(document));
+            document.querySelector('#toc').appendChild(window.documentOutline.createTOC(window.documentOutline.extractOutline(document)));
         });
     </script>
 </head>

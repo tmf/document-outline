@@ -15,5 +15,8 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-jasmine": "^0.8.2"
+  },
+  "dependencies": {
+    "slug": "^0.8.0"
   }
 }
